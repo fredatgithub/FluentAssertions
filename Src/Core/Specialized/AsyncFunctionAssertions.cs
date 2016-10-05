@@ -69,8 +69,11 @@ namespace FluentAssertions.Specialized
         {
             try
             {
-                Task task = Subject();
-                task.Wait();
+#if NETSTANDARD1_3
+                Task.Run(Subject).Wait();
+#else
+                Task.Factory.StartNew(() => Subject().Wait());
+#endif
             }
             catch (Exception exception)
             {
@@ -97,8 +100,11 @@ namespace FluentAssertions.Specialized
         {
             try
             {
-                Task task = Subject();
-                task.Wait();
+#if NETSTANDARD1_3
+                Task.Run(Subject).Wait();
+#else
+                Task.Factory.StartNew(() => Subject().Wait());
+#endif
             }
             catch (Exception aggregateException)
             {
@@ -121,8 +127,11 @@ namespace FluentAssertions.Specialized
 
             try
             {
-                Task task = Subject();
-                task.Wait();
+#if NETSTANDARD1_3
+                Task.Run(Subject).Wait();
+#else
+                Task.Factory.StartNew(() => Subject().Wait());
+#endif
             }
             catch (Exception exception)
             {
