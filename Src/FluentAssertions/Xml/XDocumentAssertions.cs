@@ -472,7 +472,7 @@ public class XDocumentAssertions : ReferenceTypeAssertions<XDocument, XDocumentA
                     .ForCondition(collection => collection.Any(e => e.Value == expectedValue))
                     .FailWith("but the element {0} does not have such a value.", expectedElement));
 
-        return new AndWhichConstraint<XDocumentAssertions, XElement>(this, xElements.First());
+        return new AndWhichConstraint<XDocumentAssertions, XElement>(this, xElements.FirstOrDefault());
     }
 
     /// <summary>
@@ -531,8 +531,8 @@ public class XDocumentAssertions : ReferenceTypeAssertions<XDocument, XDocumentA
                     .ForCondition(Subject is not null)
                     .FailWith("but the element itself is <null>.")
                     .Then
-                    .ForCondition(Subject!.Root!.Elements(unexpectedElement)
-                        .FirstOrDefault(e => e.Value == unexpectedValue) is null)
+                    .ForCondition(!Subject!.Root!.Elements(unexpectedElement)
+                        .Any(e => e.Value == unexpectedValue))
                     .FailWith("but the element {0} does have this value.", unexpectedElement));
 
         return new AndConstraint<XDocumentAssertions>(this);
