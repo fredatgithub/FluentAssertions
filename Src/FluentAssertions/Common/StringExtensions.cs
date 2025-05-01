@@ -103,7 +103,7 @@ internal static class StringExtensions
     public static string IndentLines(this string @this)
     {
         return string.Join(Environment.NewLine,
-            @this.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(x => $"\t{x}"));
+            @this.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries).Select(x => $"\t{x}"));
     }
 
     public static string RemoveNewLines(this string @this)
@@ -115,7 +115,7 @@ internal static class StringExtensions
     public static string RemoveNewlineStyle(this string @this)
     {
         return @this.Replace("\r\n", "\n", StringComparison.Ordinal)
-            .Replace("\r", "\n", StringComparison.Ordinal);
+            .Replace('\r', '\n');
     }
 
     public static string RemoveTrailingWhitespaceFromLines(this string input)
