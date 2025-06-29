@@ -7,14 +7,15 @@ namespace FluentAssertions.Execution;
 
 internal abstract class LateBoundTestFramework : ITestFramework
 {
-    private readonly bool loadAssembly;
-    private Func<string, Exception> exceptionFactory;
+    private Func<string, Exception> exceptionFactory =
+        _ => throw new InvalidOperationException($"{nameof(IsAvailable)} must be called first.");
 
-    protected LateBoundTestFramework(bool loadAssembly = false)
-    {
-        this.loadAssembly = loadAssembly;
-        exceptionFactory = _ => throw new InvalidOperationException($"{nameof(IsAvailable)} must be called first.");
-    }
+    /// <summary>
+    /// When set to <see langword="true"/>, the assembly specified by the <see cref="AssemblyName"/> property will
+    /// be dynamically loaded if it is not already loaded in the application domain.
+    /// When set to <see langword="false"/>, the framework will not attempt to load the assembly dynamically.
+    /// </summary>
+    protected bool LoadAssembly { get; init; }
 
     [DoesNotReturn]
     public void Throw(string message) => throw exceptionFactory(message);
@@ -38,7 +39,7 @@ internal abstract class LateBoundTestFramework : ITestFramework
     {
         var assembly = Array.Find(AppDomain.CurrentDomain.GetAssemblies(), a => a.GetName().Name == AssemblyName);
 
-        if (assembly is null && loadAssembly)
+        if (assembly is null && LoadAssembly)
         {
             try
             {

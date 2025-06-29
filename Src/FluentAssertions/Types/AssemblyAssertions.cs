@@ -58,7 +58,7 @@ public class AssemblyAssertions : ReferenceTypeAssertions<Assembly, AssemblyAsse
 
             assertionChain
                 .BecauseOf(because, becauseArgs)
-                .ForCondition(!references.Contains(assemblyName))
+                .ForCondition(!references.Contains(assemblyName, StringComparer.Ordinal))
                 .FailWith("Expected assembly {0} not to reference assembly {1}{reason}.", subjectName, assemblyName);
         }
 
@@ -97,7 +97,7 @@ public class AssemblyAssertions : ReferenceTypeAssertions<Assembly, AssemblyAsse
 
             assertionChain
                 .BecauseOf(because, becauseArgs)
-                .ForCondition(references.Contains(assemblyName))
+                .ForCondition(references.Contains(assemblyName, StringComparer.Ordinal))
                 .FailWith("Expected assembly {0} to reference assembly {1}{reason}, but it does not.", subjectName, assemblyName);
         }
 

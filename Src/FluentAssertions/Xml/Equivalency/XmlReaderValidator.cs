@@ -26,24 +26,27 @@ internal class XmlReaderValidator
         this.expectationReader = expectationReader;
     }
 
-    public void Validate(bool shouldBeEquivalent)
+    public void AssertThatItIsEquivalent()
     {
         Failure failure = Validate();
 
-        if (shouldBeEquivalent && failure is not null)
+        if (failure is not null)
         {
             assertionChain.FailWith(failure.FormatString, failure.FormatParams);
         }
+    }
 
-        if (!shouldBeEquivalent && failure is null)
+    public void AssertThatIsNotEquivalent()
+    {
+        Failure failure = Validate();
+
+        if (failure is null)
         {
             assertionChain.FailWith("Did not expect {context:subject} to be equivalent{reason}, but it is.");
         }
     }
 
-#pragma warning disable MA0051
     private Failure Validate()
-#pragma warning restore MA0051
     {
         if (subjectReader is null && expectationReader is null)
         {
@@ -82,6 +85,7 @@ internal class XmlReaderValidator
 #pragma warning restore IDE0010
             {
                 case XmlNodeType.Element:
+                {
                     failure = ValidateStartElement();
 
                     if (failure is not null)
@@ -111,24 +115,36 @@ internal class XmlReaderValidator
                     {
                         subjectIterator.MoveToEndElement();
                     }
+                    else
+                    {
+                        // Both are either empty or not empty, so we can continue
+                    }
 
+                    // Both are either empty or not empty, so we can continue
                     break;
+                }
 
                 case XmlNodeType.EndElement:
+                {
                     // No need to verify end element, if it doesn't match
                     // the start element it isn't valid XML, so the parser
                     // would handle that.
                     currentNode.Pop();
                     currentNode = currentNode.Parent;
                     break;
+                }
 
                 case XmlNodeType.Text:
+                {
                     failure = ValidateText();
                     break;
+                }
 
                 default:
+                {
                     throw new NotSupportedException(
                         $"{expectationIterator.NodeType} found at {currentNode.GetXPath()} is not supported for equivalency comparison.");
+                }
             }
 
             if (failure is not null)
@@ -164,9 +180,9 @@ internal class XmlReaderValidator
 
         foreach (AttributeData subjectAttribute in subjectAttributes)
         {
-            AttributeData expectedAttribute = expectedAttributes.SingleOrDefault(
-                ea => ea.NamespaceUri == subjectAttribute.NamespaceUri
-                    && ea.LocalName == subjectAttribute.LocalName);
+            AttributeData expectedAttribute = expectedAttributes.SingleOrDefault(ea =>
+                ea.NamespaceUri == subjectAttribute.NamespaceUri
+                && ea.LocalName == subjectAttribute.LocalName);
 
             if (expectedAttribute is null)
             {
