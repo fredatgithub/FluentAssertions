@@ -1,4 +1,5 @@
 using System;
+using FluentAssertions.Execution;
 using Xunit;
 using Xunit.Sdk;
 
@@ -46,7 +47,11 @@ public class InlineAssertionsSpecs
         };
 
         // Act
-        var act = () => actual.Should().BeEquivalentTo(expectation);
+        var act = () =>
+        {
+            using var _ = new AssertionScope();
+            actual.Should().BeEquivalentTo(expectation);
+        };
 
         // Assert
         act.Should().Throw<XunitException>().WithMessage("*actual.Age*type*String*found*Int32*");
@@ -82,17 +87,20 @@ public class InlineAssertionsSpecs
             Age = 30
         };
 
-        var expectation = new
+        // Act
+        var act = () =>
         {
-            Name = "John",
-            Age = Value.ThatMatches<int>(null)
+            var expectation = new
+            {
+                Name = "John",
+                Age = Value.ThatMatches<int>(null)
+            };
+
+            actual.Should().BeEquivalentTo(expectation);
         };
 
-        // Act
-        var act = () => actual.Should().BeEquivalentTo(expectation);
-
         // Assert
-        act.Should().Throw<ArgumentNullException>().WithMessage("*condition*required*");
+        act.Should().Throw<ArgumentNullException>().WithParameterName("condition");
     }
 
     [Fact]
@@ -148,17 +156,20 @@ public class InlineAssertionsSpecs
             Age = 30
         };
 
-        var expectation = new
+        // Act
+        var act = () =>
         {
-            Name = "John",
-            Age = Value.ThatSatisfies<int>(null)
+            var expectation = new
+            {
+                Name = "John",
+                Age = Value.ThatSatisfies<int>(null)
+            };
+
+            actual.Should().BeEquivalentTo(expectation);
         };
 
-        // Act
-        var act = () => actual.Should().BeEquivalentTo(expectation);
-
         // Assert
-        act.Should().Throw<ArgumentNullException>().WithMessage("*assertion*required*");
+        act.Should().Throw<ArgumentNullException>().WithParameterName("assertion");
     }
 
     [Fact]
@@ -178,7 +189,11 @@ public class InlineAssertionsSpecs
         };
 
         // Act
-        var act = () => actual.Should().BeEquivalentTo(expectation);
+        var act = () =>
+        {
+            using var _ = new AssertionScope();
+            actual.Should().BeEquivalentTo(expectation);
+        };
 
         // Assert
         act.Should().Throw<XunitException>().WithMessage("*actual.Age*type*String*found*Int32*");
