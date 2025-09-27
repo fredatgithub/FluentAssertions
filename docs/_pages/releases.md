@@ -7,6 +7,13 @@ sidebar:
   nav: "sidebar"
 ---
 
+## 8.7.0
+
+### What's new
+
+* Added support for `System.Text.Json.JsonNode` and `JsonArray` through new assertions as well as the `BeEquivalentTo` API - [#3094](https://github.com/fluentassertions/fluentassertions/pull/3094)
+* Added `WithoutMessage` to allow asserting an exception message does not contain a wildcard pattern - [#3100](https://github.com/fluentassertions/fluentassertions/pull/3100)
+
 ## 8.6.0
 
 ### What's new
