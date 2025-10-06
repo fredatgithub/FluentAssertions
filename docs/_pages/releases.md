@@ -7,6 +7,23 @@ sidebar:
   nav: "sidebar"
 ---
 
+## 8.8.0
+
+### What's new
+
+* Added `WithoutMessage` to allow asserting an exception message does not contain a wildcard pattern - [#3100](https://github.com/fluentassertions/fluentassertions/pull/3100)
+
+### Enhancements
+
+* Improved the way the differences are reported for long strings - [#3101](https://github.com/fluentassertions/fluentassertions/pull/3101)
+
+## 8.7.1
+
+### Fixes
+
+* Fixed ambiguity when using `Should()` on a `JsonNode` derived class - [#3102](https://github.com/fluentassertions/fluentassertions/pull/3102)
+* JSON assertions did not properly handle floats, doubles and unsigned int/long - [#3105](https://github.com/fluentassertions/fluentassertions/pull/3105)
+
 ## 8.7.0
 
 ### What's new
