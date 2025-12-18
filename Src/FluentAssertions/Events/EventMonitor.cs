@@ -123,7 +123,7 @@ internal sealed class EventMonitor<T> : IMonitor<T>
         recorderMap.Clear();
     }
 
-    private void DisposeSafeIfRequested(IDisposable recorder)
+    private void DisposeSafeIfRequested(EventRecorder recorder)
     {
         try
         {
@@ -137,7 +137,7 @@ internal sealed class EventMonitor<T> : IMonitor<T>
 
     private void AttachEventHandler(EventInfo eventInfo, Func<DateTime> utcNow)
     {
-        if (!recorderMap.TryGetValue(eventInfo.Name, out _))
+        if (!recorderMap.ContainsKey(eventInfo.Name))
         {
             var recorder = new EventRecorder(subject.Target, eventInfo.Name, utcNow, threadSafeSequenceGenerator);
 

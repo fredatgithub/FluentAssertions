@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
 using FluentAssertions.Common;
@@ -10,32 +11,25 @@ internal class Node : INode
 {
     private static readonly Regex MatchFirstIndex = new(@"^\[[0-9]+\]$");
 
-    private GetSubjectId subjectIdProvider;
-
     private string cachedSubjectId;
-    private Pathway subject;
 
     public GetSubjectId GetSubjectId
     {
-        get => () => cachedSubjectId ??= subjectIdProvider();
-        protected init => subjectIdProvider = value;
+        get => () => cachedSubjectId ??= field();
+        protected init => field = value;
     }
 
-    public Type Type { get; protected set; }
+    public Type Type { get; init; }
 
-    public Type ParentType { get; protected set; }
+    public Type ParentType { get; init; }
 
     public Pathway Subject
     {
-        get => subject;
-        set
+        get;
+        protected set
         {
-            subject = value;
-
-            if (Expectation is null)
-            {
-                Expectation = value;
-            }
+            field = value;
+            Expectation ??= value;
         }
     }
 
@@ -53,7 +47,7 @@ internal class Node : INode
 
     private bool IsFirstIndex => MatchFirstIndex.IsMatch(Subject.PathAndName);
 
-    public bool RootIsCollection { get; protected set; }
+    public bool RootIsCollection { get; init; }
 
     public void AdjustForRemappedSubject(IMember subjectMember)
     {
@@ -78,7 +72,7 @@ internal class Node : INode
     {
         return new Node
         {
-            subjectIdProvider = () => getSubjectId() ?? "root",
+            GetSubjectId = () => getSubjectId() ?? "root",
             Subject = new Pathway(string.Empty, string.Empty, _ => getSubjectId()),
             Type = typeof(T),
             ParentType = null,
@@ -142,6 +136,7 @@ internal class Node : INode
 
     private bool Equals(Node other) => (Type, Subject.Name, Subject.Path) == (other.Type, other.Subject.Name, other.Subject.Path);
 
+    [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
     public override int GetHashCode()
     {
         unchecked

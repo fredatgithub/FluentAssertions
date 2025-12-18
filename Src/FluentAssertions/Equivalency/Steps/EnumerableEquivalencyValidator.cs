@@ -1,9 +1,12 @@
+#if !NET6_0_OR_GREATER
+using System;
+#endif
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using FluentAssertions.Equivalency.Execution;
 using FluentAssertions.Equivalency.Tracing;
 using FluentAssertions.Execution;
-using static System.FormattableString;
 
 namespace FluentAssertions.Equivalency.Steps;
 
@@ -28,12 +31,11 @@ internal class EnumerableEquivalencyValidator
         this.assertionChain = assertionChain;
         this.parent = parent;
         this.context = context;
-        Recursive = false;
     }
 
-    public bool Recursive { get; init; }
+    public required bool Recursive { get; init; }
 
-    public OrderingRuleCollection OrderingRules { get; init; }
+    public required OrderingRuleCollection OrderingRules { get; init; }
 
     public void Execute<T>(object[] subject, T[] expectation)
     {
@@ -42,14 +44,15 @@ internal class EnumerableEquivalencyValidator
             if (Recursive)
             {
                 using var _ = context.Tracer.WriteBlock(member =>
-                    Invariant($"Structurally comparing {subject} and expectation {expectation} at {member.Expectation}"));
+                    string.Create(CultureInfo.InvariantCulture,
+                        $"Structurally comparing {subject} and expectation {expectation} at {member.Expectation}"));
 
                 AssertElementGraphEquivalency(subject, expectation, context.CurrentNode);
             }
             else
             {
                 using var _ = context.Tracer.WriteBlock(member =>
-                    Invariant(
+                    string.Create(CultureInfo.InvariantCulture,
                         $"Comparing subject {subject} and expectation {expectation} at {member.Expectation} using simple value equality"));
 
                 subject.Should().BeEquivalentTo(expectation);
@@ -101,7 +104,7 @@ internal class EnumerableEquivalencyValidator
             T expectation = expectations[index];
 
             using var _ = context.Tracer.WriteBlock(member =>
-                Invariant(
+                string.Create(CultureInfo.InvariantCulture,
                     $"Strictly comparing expectation {expectation} at {member.Expectation} to item with index {index} in {subjects}"));
 
             bool succeeded = StrictlyMatchAgainst(subjects, expectation, index);
@@ -128,7 +131,7 @@ internal class EnumerableEquivalencyValidator
             T expectation = expectations[index];
 
             using var _ = context.Tracer.WriteBlock(member =>
-                Invariant(
+                string.Create(CultureInfo.InvariantCulture,
                     $"Finding the best match of {expectation} within all items in {subjects} at {member.Expectation}[{index}]"));
 
             bool succeeded = LooselyMatchAgainst(subjects, expectation, index);

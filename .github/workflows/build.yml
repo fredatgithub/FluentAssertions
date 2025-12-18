@@ -7,11 +7,16 @@ jobs:
     name: "Build, Test, Analyze and Publish"
     runs-on: windows-latest
 
+    permissions:
+      id-token: write
+      attestations: write
+      contents: read
+
     env:
       DOTNET_NOLOGO: true
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 0
 
@@ -21,10 +26,10 @@ jobs:
         dotnet-version: |
           6.0.x
           8.0.x
-          9.0.x
+          10.0.x
 
     - name: Cache .nuke/temp
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: |
           .nuke/temp
@@ -49,9 +54,22 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         file: TestResults/reports/lcov.info
 
+    - name: Check for NuGet package existence
+      id: check_nupkg
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: andstor/file-existence-action@v3
+      with:
+        files: "Artifacts/*.nupkg"
+
+    - name: Attest NuGet package
+      uses: actions/attest-build-provenance@v3
+      if: startsWith(github.ref, 'refs/tags/') && steps.check_nupkg.outputs.files_exists == 'true'
+      with:
+        subject-path: ./Artifacts/*.nupkg
+
     - name: Upload artifacts
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: windows-artifacts
         path: |
@@ -67,7 +85,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 0
 
@@ -77,14 +95,14 @@ jobs:
         dotnet-version: |
           6.0.x
           8.0.x
-          9.0.x
+          10.0.x
 
     - name: Run NUKE
       run: ./build.sh UnitTests
 
     - name: Upload artifacts
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ runner.os }}-artifacts
         path: |
@@ -101,7 +119,7 @@ jobs:
 
     steps:
     - name: Download Artifacts
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v7
       with:
         path: artifacts
 

@@ -61,7 +61,7 @@ class Build : NukeBuild
     readonly Solution Solution;
 
     [Required]
-    [GitVersion(Framework = "net9.0", NoCache = true, NoFetch = true)]
+    [GitVersion(Framework = "net10.0", NoCache = true, NoFetch = true)]
     readonly GitVersion GitVersion;
 
     [Required]
@@ -129,7 +129,7 @@ class Build : NukeBuild
             DotNetBuild(s => s
                 .SetProjectFile(Solution)
                 .SetConfiguration(Configuration)
-                .When(_ => GenerateBinLog is true, c => c
+                .When(_ => GenerateBinLog == true, c => c
                     .SetBinaryLog(ArtifactsDirectory / $"{Solution.Core.FluentAssertions.Name}.binlog")
                 )
                 .EnableNoLogo()
@@ -228,7 +228,7 @@ class Build : NukeBuild
         {
             ReportGenerator(s => s
                 .SetProcessToolPath(NuGetToolPathResolver.GetPackageExecutable("ReportGenerator", "ReportGenerator.dll",
-                    framework: "net9.0"))
+                    framework: "net10.0"))
                 .SetTargetDirectory(TestResultsDirectory / "reports")
                 .AddReports(TestResultsDirectory / "**/coverage.cobertura.xml")
                 .AddReportTypes(
@@ -299,7 +299,7 @@ class Build : NukeBuild
                 from framework in frameworks
                 select new { project, framework };
 
-            DotNetTest(s => s
+            DotNetRun(s => s
                 .SetConfiguration(Configuration.Debug)
                 .SetProcessEnvironmentVariable("DOTNET_CLI_UI_LANGUAGE", "en-US")
                 .EnableNoBuild()

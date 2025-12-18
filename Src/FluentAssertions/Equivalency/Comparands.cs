@@ -1,20 +1,18 @@
 ﻿using System;
+using System.Globalization;
 using FluentAssertions.Common;
-using static System.FormattableString;
 
 namespace FluentAssertions.Equivalency;
 
 public class Comparands
 {
-    private Type compileTimeType;
-
     public Comparands()
     {
     }
 
     public Comparands(object subject, object expectation, Type compileTimeType)
     {
-        this.compileTimeType = compileTimeType;
+        CompileTimeType = compileTimeType;
         Subject = subject;
         Expectation = expectation;
     }
@@ -36,11 +34,11 @@ public class Comparands
     {
         get
         {
-            return compileTimeType != typeof(object) || Expectation is null ? compileTimeType : RuntimeType;
+            return field != typeof(object) || Expectation is null ? field : RuntimeType;
         }
 
         // SMELL: Do we really need this? Can we replace it by making Comparands generic or take a constructor parameter?
-        set => compileTimeType = value;
+        set;
     }
 
     /// <summary>
@@ -74,6 +72,6 @@ public class Comparands
 
     public override string ToString()
     {
-        return Invariant($"{{Subject={Subject}, Expectation={Expectation}}}");
+        return string.Create(CultureInfo.InvariantCulture, $"{{Subject={Subject}, Expectation={Expectation}}}");
     }
 }
