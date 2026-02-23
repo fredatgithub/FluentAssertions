@@ -53,6 +53,11 @@ public abstract class DelegateAssertionsBase<TDelegate, TAssertions>
                     exception?.GetType(),
                     exception));
 
+        AssertionChain.GetOrCreate()
+            .ReuseOnce()
+            .AdvanceToNextIdentifier()
+            .WithCallerPrefix($"{typeof(TException).Name}.");
+
         return new ExceptionAssertions<TException>(expectedExceptions, assertionChain);
     }
 

@@ -7,11 +7,21 @@ sidebar:
   nav: "sidebar"
 ---
 
-## Unreleased
+## 8.9.0
 
 ### What's new
 
-* New overloads of `BeXmlSerializable` and `BeDataContractSerializable` that allow `EquivalencyOptions` to be configured, allowing the use of member selection rules. - [#3107](https://github.com/fluentassertions/fluentassertions/pull/3107)
+* Added `Excluding<T>()` and `Excluding(Type)` overloads to exclude all members of a certain type from equivalency comparisons - [#3115](https://github.com/fluentassertions/fluentassertions/pull/3115)
+* `BeEquivalentTo` will now report the missing or extraneous items for differently sized collections - [#3133](https://github.com/fluentassertions/fluentassertions/pull/3133)
+
+### Enhancements
+* Added option `WithFullDump` to `BeEquivalentTo` to include the entire contents of the subject-under-test in the failure message - [#3133](https://github.com/fluentassertions/fluentassertions/pull/3133)
+* Remove FluentAssertions code from the stack trace when an assertion fails - [#3152](https://github.com/fluentassertions/fluentassertions/pull/3152)
+* Improve reporting the subject when chaining `Throw` with `Which` - [#3160](https://github.com/fluentassertions/fluentassertions/pull/3160)
+
+### Fixes
+
+* Fixed a formatting exception when comparing strings containing braces - [#3151](https://github.com/fluentassertions/fluentassertions/pull/3151)
 
 ## 8.8.0
 
@@ -19,6 +29,7 @@ sidebar:
 
 * Added `WithoutMessage` to allow asserting an exception message does not contain a wildcard pattern - [#3100](https://github.com/fluentassertions/fluentassertions/pull/3100)
 * Added support for MSTest 4 - [#3111](https://github.com/fluentassertions/fluentassertions/pull/3111)
+* New overloads of `BeXmlSerializable` and `BeDataContractSerializable` that allow `EquivalencyOptions` to be configured, allowing the use of member selection rules. - [#3107](https://github.com/fluentassertions/fluentassertions/pull/3107)
 
 ### Enhancements
 

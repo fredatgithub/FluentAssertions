@@ -747,6 +747,7 @@ namespace FluentAssertions.Equivalency
         bool? CompareRecordsByValue { get; }
         FluentAssertions.Equivalency.ConversionSelector ConversionSelector { get; }
         FluentAssertions.Equivalency.CyclicReferenceHandling CyclicReferenceHandling { get; }
+        bool EnableFullDump { get; }
         FluentAssertions.Equivalency.EnumEquivalencyHandling EnumEquivalencyHandling { get; }
         bool ExcludeNonBrowsableOnExpectation { get; }
         bool IgnoreCase { get; }
@@ -895,6 +896,7 @@ namespace FluentAssertions.Equivalency
         protected SelfReferenceEquivalencyOptions(FluentAssertions.Equivalency.IEquivalencyOptions defaults) { }
         public bool? CompareRecordsByValue { get; }
         public FluentAssertions.Equivalency.ConversionSelector ConversionSelector { get; }
+        public bool EnableFullDump { get; }
         public bool IgnoreCase { get; }
         public bool IgnoreJsonPropertyCasing { get; set; }
         public bool IgnoreLeadingWhitespace { get; }
@@ -916,6 +918,8 @@ namespace FluentAssertions.Equivalency
         public TSelf ComparingRecordsByMembers() { }
         public TSelf ComparingRecordsByValue() { }
         public TSelf Excluding(System.Linq.Expressions.Expression<System.Func<FluentAssertions.Equivalency.IMemberInfo, bool>> predicate) { }
+        public TSelf Excluding(System.Type type) { }
+        public TSelf Excluding<TMember>() { }
         public TSelf ExcludingExplicitlyImplementedProperties() { }
         public TSelf ExcludingFields() { }
         public TSelf ExcludingMembersNamed(params string[] memberNames) { }
@@ -952,6 +956,7 @@ namespace FluentAssertions.Equivalency
             where TEqualityComparer : System.Collections.Generic.IEqualityComparer<T>, new () { }
         public TSelf WithAutoConversion() { }
         public TSelf WithAutoConversionFor(System.Linq.Expressions.Expression<System.Func<FluentAssertions.Equivalency.IObjectInfo, bool>> predicate) { }
+        public TSelf WithFullDump() { }
         public TSelf WithStrictOrdering() { }
         public TSelf WithStrictOrderingFor(System.Linq.Expressions.Expression<System.Func<FluentAssertions.Equivalency.IObjectInfo, bool>> predicate) { }
         public TSelf WithStrictTyping() { }
@@ -1136,8 +1141,9 @@ namespace FluentAssertions.Execution
         public FluentAssertions.Execution.AssertionChain ForConstraint(FluentAssertions.OccurrenceConstraint constraint, int actualOccurrences) { }
         public FluentAssertions.Execution.GivenSelector<T> Given<T>(System.Func<T> selector) { }
         public void OverrideCallerIdentifier(System.Func<string> getCallerIdentifier) { }
-        public void ReuseOnce() { }
+        public FluentAssertions.Execution.AssertionChain ReuseOnce() { }
         public FluentAssertions.Execution.AssertionChain WithCallerPostfix(string postfix) { }
+        public FluentAssertions.Execution.AssertionChain WithCallerPrefix(string prefix) { }
         public FluentAssertions.Execution.AssertionChain WithDefaultIdentifier(string identifier) { }
         public FluentAssertions.Execution.Continuation WithExpectation(string message, System.Action<FluentAssertions.Execution.AssertionChain> chain) { }
         public FluentAssertions.Execution.Continuation WithExpectation(string message, object arg1, System.Action<FluentAssertions.Execution.AssertionChain> chain) { }

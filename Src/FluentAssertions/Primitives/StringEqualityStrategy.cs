@@ -8,6 +8,7 @@ using FluentAssertions.Execution;
 
 namespace FluentAssertions.Primitives;
 
+[System.Diagnostics.StackTraceHidden]
 internal class StringEqualityStrategy : IStringComparisonStrategy
 {
     private readonly IEqualityComparer<string> comparer;
@@ -164,17 +165,17 @@ internal class StringEqualityStrategy : IStringComparisonStrategy
 
         if (IncludeFullDetails && wasTruncated)
         {
-            sb.AppendFormat(CultureInfo.InvariantCulture,
+            sb.Append(CultureInfo.InvariantCulture,
                 $"""
 
 
                  Full expectation:
 
-                 {expected.RenderAsIndentedBlock().AsNonFormattable()},
+                 {expected.RenderAsIndentedBlock()},
 
                  Full subject:
 
-                 {subject.RenderAsIndentedBlock().AsNonFormattable()}
+                 {subject.RenderAsIndentedBlock()}
 
                  """);
         }

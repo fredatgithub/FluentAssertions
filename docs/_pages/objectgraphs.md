@@ -165,6 +165,29 @@ orderDto.Should().BeEquivalentTo(order, options => options
     .ExcludingMembersNamed("ID", "Version"));
 ```
 
+You can also exclude all members of a certain type from the comparison. This is useful when you want to ignore certain types throughout the entire object graph:
+
+```csharp
+orderDto.Should().BeEquivalentTo(order, options => options 
+    .Excluding<DateTime>());
+```
+
+This works for any type, including interfaces (which will exclude all types implementing that interface):
+
+```csharp
+orderDto.Should().BeEquivalentTo(order, options => options 
+    .Excluding<IEnumerable<int>>());
+```
+
+You can also exclude members of open generic types by passing the type definition:
+
+```csharp
+orderDto.Should().BeEquivalentTo(order, options => options 
+    .Excluding(typeof(Nullable<>)));
+```
+
+This will exclude all nullable value types like `int?`, `DateTime?`, etc. The exclusion also applies to derived types, so excluding a base class will also exclude all types that derive from it.
+
 Maybe far-fetched, but you may even decide to exclude a member on a particular nested object by its index.
 
 ```csharp
@@ -478,7 +501,7 @@ orderDto.Should().BeEquivalentTo(expectation, options => options.WithoutStrictOr
 
 `Should().BeEquivalentTo` is a very powerful feature, and one of the unique selling points of Fluent Assertions. But sometimes it can be a bit overwhelming, especially if some assertion fails under unexpected conditions. To help you understand how Fluent Assertions compared two (collections of) object graphs, the failure message will always include the relevant configuration settings:
 
-```csharp
+```
 Xunit.Sdk.XunitException
 Expected item[0] to be 0x06, but found 0x01.
 Expected item[1] to be 0x05, but found 0x02.
@@ -496,7 +519,28 @@ With configuration:
 - Be strict about the order of items in byte arrays
 ```
 
-However, sometimes that's not enough. For those scenarios where you need to understand a bit more, you can add the `WithTracing` option. When added to the assertion call, it would extend the above output with something like this:
+For more complicated comparisons where some items match, some items are missing or some items are unexpected, it might be useful to dump the entire contents of the subject-under-test. You can do this using the `WithFullDump` option. This will add something like this to the failure message.
+
+```
+Full dump of actual: {
+    FluentAssertions.Equivalency.Specs.Customer
+    {
+        Age = 13,
+        Birthdate = <0001-01-01 00:00:00.000>,
+        Id = 0L,
+        Name = "Jits"
+    },
+    FluentAssertions.Equivalency.Specs.Customer
+    {
+        Age = 16,
+        Birthdate = <0001-01-01 00:00:00.000>,
+        Id = 0L,
+        Name = "Teddie"
+    }
+}
+```
+
+However, sometimes even that is not enough. For those scenarios where you need to understand a bit more, you can add the `WithTracing` option. When added to the assertion call, it would extend the above output with something like this:
 
 ```text
 With trace:

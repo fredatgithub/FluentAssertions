@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
@@ -14,6 +14,7 @@ namespace FluentAssertions.Execution;
 /// This is the core engine of many of the assertion APIs in this library. When combined with <see cref="AssertionScope"/>,
 /// you can run multiple assertions which failure messages will be collected until the scope is disposed.
 /// </remarks>
+[System.Diagnostics.StackTraceHidden]
 public sealed class AssertionChain
 {
     private readonly Func<AssertionScope> getCurrentScope;
@@ -31,9 +32,10 @@ public sealed class AssertionChain
     /// <summary>
     /// Ensures that the next call to <see cref="GetOrCreate"/> will reuse the current instance.
     /// </summary>
-    public void ReuseOnce()
+    public AssertionChain ReuseOnce()
     {
         Instance.Value = this;
+        return this;
     }
 
     /// <summary>
@@ -287,7 +289,17 @@ public sealed class AssertionChain
     public AssertionChain WithCallerPostfix(string postfix)
     {
         identifierBuilder.UsePostfix(postfix);
+        return this;
+    }
 
+    /// <summary>
+    /// Adds a specified prefix to the caller identifier used in the current assertion chain.
+    /// </summary>
+    /// <param name="prefix">The prefix to prepend to the caller identifier.</param>
+    /// <returns>An updated instance of <see cref="AssertionChain"/> with the specified prefix applied.</returns>
+    public AssertionChain WithCallerPrefix(string prefix)
+    {
+        identifierBuilder.UsePrefix(prefix);
         return this;
     }
 
@@ -295,9 +307,10 @@ public sealed class AssertionChain
     /// Marks the next assertion as being part of a chained call to Should where it needs to find the next
     /// caller identifier.
     /// </summary>
-    internal void AdvanceToNextIdentifier()
+    internal AssertionChain AdvanceToNextIdentifier()
     {
         identifierBuilder.AdvanceToNextSubject();
+        return this;
     }
 
     /// <summary>

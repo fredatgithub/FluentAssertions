@@ -1,12 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
+#if NET6_0_OR_GREATER
+using System.Runtime.CompilerServices;
+#endif
 using System.Text.RegularExpressions;
 using FluentAssertions.Formatting;
 
 namespace FluentAssertions.Common;
 
+[System.Diagnostics.StackTraceHidden]
 internal static class StringExtensions
 {
     /// <summary>
@@ -178,4 +183,16 @@ internal static class StringExtensions
 
         return "    \"" + string.Join(Environment.NewLine + "    ", wrappedLines) + "\"";
     }
+
+    /// <summary>
+    /// Simplifies setting the invariant culture when using interpolated strings.
+    /// </summary>
+#if NET6_0_OR_GREATER
+    public static string Invariant(ref DefaultInterpolatedStringHandler formattable)
+        => string.Create(CultureInfo.InvariantCulture, ref formattable);
+#else
+    public static string Invariant(FormattableString formattable)
+        => string.Create(CultureInfo.InvariantCulture, formattable);
+#endif
 }
+

@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace FluentAssertions.Common;
 
+[System.Diagnostics.StackTraceHidden]
 internal static class EnumerableExtensions
 {
     public static ICollection<T> ConvertOrCastToCollection<T>(this IEnumerable<T> source)
@@ -53,6 +54,21 @@ internal static class EnumerableExtensions
             }
 
             index++;
+        }
+    }
+
+    /// <summary>
+    /// Enumerates a sequence, returning each element along with its index.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the sequence.</typeparam>
+    /// <param name="items">The sequence to enumerate.</param>
+    /// <returns>An enumerable of tuples, where each tuple contains the index and the element at that index in the sequence.</returns>
+    public static IEnumerable<(int Index, T Item)> Index<T>(this IEnumerable<T> items)
+    {
+        int index = 0;
+        foreach (var item in items)
+        {
+            yield return (index++, item);
         }
     }
 }

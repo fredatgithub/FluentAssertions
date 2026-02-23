@@ -11,6 +11,7 @@ namespace FluentAssertions.Equivalency;
 /// <summary>
 /// Collects the members that need to be converted by the <see cref="AutoConversionStep"/>.
 /// </summary>
+[System.Diagnostics.StackTraceHidden]
 public class ConversionSelector
 {
     private sealed class ConversionSelectorRule
@@ -89,7 +90,7 @@ public class ConversionSelector
     {
         if (inclusions.Count == 0 && exclusions.Count == 0)
         {
-            return "Without automatic conversion.";
+            return "Without automatic conversion";
         }
 
         var descriptionBuilder = new StringBuilder();
@@ -112,3 +113,4 @@ public class ConversionSelector
         return new ConversionSelector(new List<ConversionSelectorRule>(inclusions), new List<ConversionSelectorRule>(exclusions));
     }
 }
+

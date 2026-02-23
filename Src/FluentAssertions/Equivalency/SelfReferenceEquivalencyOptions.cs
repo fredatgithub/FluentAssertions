@@ -21,6 +21,7 @@ namespace FluentAssertions.Equivalency;
 /// <summary>
 /// Represents the run-time behavior of a structural equivalency assertion.
 /// </summary>
+[StackTraceHidden]
 public abstract class SelfReferenceEquivalencyOptions<TSelf> : IEquivalencyOptions, IContainTypingRules
     where TSelf : SelfReferenceEquivalencyOptions<TSelf>
 {
@@ -92,6 +93,7 @@ public abstract class SelfReferenceEquivalencyOptions<TSelf> : IEquivalencyOptio
         includedFields = defaults.IncludedFields;
         ignoreNonBrowsableOnSubject = defaults.IgnoreNonBrowsableOnSubject;
         excludeNonBrowsableOnExpectation = defaults.ExcludeNonBrowsableOnExpectation;
+        EnableFullDump = defaults.EnableFullDump;
         IgnoreLeadingWhitespace = defaults.IgnoreLeadingWhitespace;
         IgnoreTrailingWhitespace = defaults.IgnoreTrailingWhitespace;
         IgnoreCase = defaults.IgnoreCase;
@@ -210,6 +212,9 @@ public abstract class SelfReferenceEquivalencyOptions<TSelf> : IEquivalencyOptio
     public bool IncludeFullStringsInDifference { get; private set; }
 
     public bool IgnoreJsonPropertyCasing { get; set; }
+
+    /// <inheritdoc />
+    public bool EnableFullDump { get; private set; }
 
     public ITraceWriter TraceWriter { get; private set; }
 
@@ -405,6 +410,58 @@ public abstract class SelfReferenceEquivalencyOptions<TSelf> : IEquivalencyOptio
     public TSelf Excluding(Expression<Func<IMemberInfo, bool>> predicate)
     {
         AddSelectionRule(new ExcludeMemberByPredicateSelectionRule(predicate));
+        return (TSelf)this;
+    }
+
+    /// <summary>
+    /// Excludes all members whose type is or derives from <typeparamref name="TMember"/> from the structural equality check.
+    /// </summary>
+    /// <typeparam name="TMember">
+    /// The type of members to exclude. All members whose type is or derives from this type will be excluded.
+    /// For sealed types, only exact type matches are excluded. For open generic types, use the <see cref="Excluding(Type)"/> overload.
+    /// </typeparam>
+    /// <remarks>
+    /// <para>
+    /// For non-sealed types, this excludes members of the specified type and all derived types.
+    /// For example, <c>Excluding&lt;BaseClass&gt;()</c> will exclude members of type <c>BaseClass</c> and <c>DerivedClass</c>.
+    /// </para>
+    /// <para>
+    /// For sealed types (like <see langword="string"/>), only exact type matches are excluded.
+    /// </para>
+    /// </remarks>
+    public TSelf Excluding<TMember>()
+    {
+        return Excluding(typeof(TMember));
+    }
+
+    /// <summary>
+    /// Excludes all members whose type is or derives from the specified <paramref name="type"/> from the structural equality check.
+    /// </summary>
+    /// <param name="type">
+    /// The type of members to exclude. All members whose type is or derives from this type will be excluded.
+    /// For sealed types, only exact type matches are excluded. For open generic types (e.g., <c>typeof(Nullable&lt;&gt;)</c>),
+    /// all closed generics and types deriving from them will be excluded.
+    /// </param>
+    /// <exception cref="ArgumentNullException"><paramref name="type"/> is <see langword="null"/>.</exception>
+    /// <remarks>
+    /// <para>
+    /// For non-sealed types, this excludes members of the specified type and all derived types.
+    /// For example, <c>Excluding(typeof(BaseClass))</c> will exclude members of type <c>BaseClass</c> and <c>DerivedClass</c>.
+    /// </para>
+    /// <para>
+    /// For sealed types (like <see langword="string"/>), only exact type matches are excluded.
+    /// </para>
+    /// <para>
+    /// For open generic types, this excludes all closed generics and types deriving from them. For example,
+    /// <c>Excluding(typeof(Nullable&lt;&gt;))</c> excludes all nullable value types like <c>int?</c>, <c>double?</c>, etc.
+    /// Similarly, <c>Excluding(typeof(List&lt;&gt;))</c> excludes <c>List&lt;int&gt;</c>, <c>List&lt;string&gt;</c>,
+    /// and any types deriving from those closed generics.
+    /// </para>
+    /// </remarks>
+    public TSelf Excluding(Type type)
+    {
+        Guard.ThrowIfArgumentIsNull(type);
+        AddSelectionRule(new ExcludeMemberByTypeSelectionRule(type));
         return (TSelf)this;
     }
 
@@ -758,6 +815,15 @@ public abstract class SelfReferenceEquivalencyOptions<TSelf> : IEquivalencyOptio
     }
 
     /// <summary>
+    /// Configures the equivalency options to include the full representation of the subject in assertion failure messages.
+    /// </summary>
+    public TSelf WithFullDump()
+    {
+        EnableFullDump = true;
+        return (TSelf)this;
+    }
+
+    /// <summary>
     /// Instructs the equivalency comparison to try to convert the values of
     /// matching properties before running any of the other steps.
     /// </summary>
@@ -1014,3 +1080,4 @@ public abstract class SelfReferenceEquivalencyOptions<TSelf> : IEquivalencyOptio
 
     #endregion
 }
+
